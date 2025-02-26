@@ -1,0 +1,54 @@
+name: renova
+services:
+    postgres:
+        image: postgres:latest
+        ports:
+            - "5432:5432"
+        restart: always
+        environment:
+            POSTGRES_DB: renova
+            POSTGRES_USER: renova
+            POSTGRES_PASSWORD: renova
+        networks:
+            - renova-network
+        healthcheck:
+            test: ["CMD", "pg_isready", "-U", "renova"]
+            interval: 10s
+            retries: 5
+
+    backend:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        depends_on:
+            - postgres
+        ports:
+            - "5000:5000"
+        command: >
+            sh -c "npm run start"
+        restart: always
+        networks:
+            - renova-network
+        volumes:
+            - ./backend:/app
+
+    frontend:
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        depends_on:
+            - backend
+        restart: always
+        ports:
+            - "8080:80"
+        networks:
+            - renova-network
+        volumes:
+            - ./frontend:/app
+
+volumes:
+    postgres_data:
+
+networks:
+    renova-network:
+        driver: bridge
