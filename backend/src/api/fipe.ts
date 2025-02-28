@@ -60,9 +60,11 @@ export class FipeAPI {
 		vehicleType: VehicleType,
 		marcaId: string
 	): Promise<IModeloData> {
-		const response = await fetch(
-			`${this.BASE_URL}/${vehicleType}/marcas/${marcaId}/modelos`
-		);
+		const url = `${this.BASE_URL}/${vehicleType}/marcas/${marcaId}/modelos`;
+		console.log("[url]");
+		console.log(url);
+		console.log();
+		const response = await fetch(url);
 		if (!response.ok) {
 			throw new Error(`Failed to fetch modelos: ${response.statusText}`);
 		}
@@ -74,9 +76,11 @@ export class FipeAPI {
 		marcaId: string,
 		modeloId: string
 	): Promise<IAnos> {
-		const response = await fetch(
-			`${this.BASE_URL}/${vehicleType}/marcas/${marcaId}/modelos/${modeloId}/anos`
-		);
+		const url = `${this.BASE_URL}/${vehicleType}/marcas/${marcaId}/modelos/${modeloId}/anos`;
+		console.log("[url]");
+		console.log(url);
+		console.log();
+		const response = await fetch(url);
 		if (!response.ok) {
 			throw new Error(`Failed to fetch anos: ${response.statusText}`);
 		}
@@ -89,9 +93,11 @@ export class FipeAPI {
 		modeloId: string,
 		ano: string
 	): Promise<IValor> {
-		const response = await fetch(
-			`${this.BASE_URL}/${vehicleType}/marcas/${marcaId}/modelos/${modeloId}/anos/${ano}`
-		);
+		const url = `${this.BASE_URL}/${vehicleType}/marcas/${marcaId}/modelos/${modeloId}/anos/${ano}`;
+		console.log("[url]");
+		console.log(url);
+		console.log();
+		const response = await fetch(url);
 		if (!response.ok) {
 			throw new Error(`Failed to fetch valor: ${response.statusText}`);
 		}

@@ -6,25 +6,37 @@ import { Speaker } from "@prisma/client";
 import { BadRequestException, Exception } from "../utils/Exception";
 import { ERROR_MESSAGES } from "../utils/Message";
 import { Bot } from "../bot/bot";
+import { AIMessage, HumanMessage } from "@langchain/core/messages";
 
 export default class MessageController {
 	private messageService = new MessageService(prisma);
 	private bot = new Bot();
 
 	async create(req: Request, res: Response) {
-		try {
-			const { conversationID } = req.params;
-			const { content } = req.body;
+		const { conversationID } = req.params;
+		const { content } = req.body;
 
+		try {
 			this.checkIfItsUUID(conversationID);
 			this.checkIfItsValidString(content);
 
+			const previousMessages = await this.messageService.findMessages(
+				conversationID
+			);
+			const formattedMessages = previousMessages.map((message) => {
+				return message.speaker === Speaker.USER
+					? new HumanMessage(message.content)
+					: new AIMessage(message.content);
+			});
 			await this.messageService.createMessages(
 				conversationID,
 				content,
 				Speaker.USER
 			);
-			const resBot = await this.bot.process(content);
+			const resBot = await this.bot.process(
+				content,
+				...formattedMessages
+			);
 			await this.messageService.createMessages(
 				conversationID,
 				resBot,
@@ -42,8 +54,8 @@ export default class MessageController {
 	}
 
 	async getAll(req: Request, res: Response) {
+		const { conversationID } = req.params;
 		try {
-			const { conversationID } = req.params;
 			this.checkIfItsUUID(conversationID);
 			const messages = await this.messageService.findMessages(
 				conversationID

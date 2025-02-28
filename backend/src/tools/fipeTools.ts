@@ -39,7 +39,7 @@ export const getModelosTool = tool(
 	{
 		name: "getModelos",
 		description:
-			"Fetch the list of vehicle models for a specific brand. Requires the vehicle type and brand ID.",
+			"Fetch the list of vehicle models for a specific brand. Requires the vehicle type and brand ID. You need to get the marcas before getting modelos.",
 		schema: z.object({
 			vehicleType: z
 				.enum(["carros", "motos", "caminhoes"])
@@ -49,7 +49,7 @@ export const getModelosTool = tool(
 			marcaId: z
 				.string()
 				.describe(
-					"The brand ID as returned from the getMarcas endpoint."
+					"The brand ID as returned from the getMarcas endpoint. YOU CANNOT GENERATE THIS VALUE, ITS A CODE."
 				),
 		}),
 	}
@@ -71,7 +71,7 @@ export const getAnosTool = tool(
 	{
 		name: "getAnos",
 		description:
-			"Fetch the list of available years for a specific vehicle model. Requires vehicle type, brand ID, and model ID.",
+			"Fetch the list of available years for a specific vehicle model. Requires vehicle type, brand ID, and model ID. You need to get the modelos before getting anos.",
 		schema: z.object({
 			vehicleType: z
 				.enum(["carros", "motos", "caminhoes"])
@@ -80,13 +80,15 @@ export const getAnosTool = tool(
 				),
 			marcaId: z
 				.string()
+				.regex(/\d+/)
 				.describe(
-					"The brand ID as returned from the getMarcas endpoint."
+					"The brand ID (numeric) as returned from the getMarcas endpoint. YOU CANNOT GENERATE THIS VALUE, ITS A CODE."
 				),
 			modeloId: z
 				.string()
+				.regex(/\d+/)
 				.describe(
-					"The model ID as returned from the getModelos endpoint."
+					"The model ID (numeric) as returned from the getModelos endpoint. YOU CANNOT GENERATE THIS VALUE, ITS A CODE."
 				),
 		}),
 	}
@@ -115,7 +117,7 @@ export const getValorTool = tool(
 	{
 		name: "getValor",
 		description:
-			"Fetch detailed price information for a specific vehicle configuration. Requires vehicle type, brand ID, model ID, and year identifier (e.g., '2014-3').",
+			"Fetch detailed price information for a specific vehicle configuration. Requires vehicle type, brand ID, model ID, and year identifier (e.g., '2014-3'). You need to get the anos before getting valor.",
 		schema: z.object({
 			vehicleType: z
 				.enum(["carros", "motos", "caminhoes"])
@@ -125,17 +127,17 @@ export const getValorTool = tool(
 			marcaId: z
 				.string()
 				.describe(
-					"The brand ID as returned from the getMarcas endpoint."
+					"The brand ID as returned from the getMarcas endpoint. YOU CANNOT GENERATE THIS VALUE, ITS A CODE."
 				),
 			modeloId: z
 				.string()
 				.describe(
-					"The model ID as returned from the getModelos endpoint."
+					"The model ID as returned from the getModelos endpoint. YOU CANNOT GENERATE THIS VALUE, ITS A CODE."
 				),
 			ano: z
 				.string()
 				.describe(
-					"The year configuration identifier (e.g., '2014-3')."
+					"The year configuration identifier (e.g., '2014-3'). YOU CANNOT GENERATE THIS VALUE, ITS A CODE."
 				),
 		}),
 	}
