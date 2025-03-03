@@ -1,15 +1,9 @@
-// Interfaces representing the API responses
-
-// Marcas endpoint returns an array of brands
 export interface IMarca {
 	codigo: string;
 	nome: string;
 }
 export type IMarcas = IMarca[];
 
-// The Modelos endpoint returns an object with two arrays:
-// - modelos: list of vehicle models
-// - anos: list of available year configurations for the models
 export interface IModeloData {
 	modelos: {
 		codigo: number;
@@ -21,14 +15,12 @@ export interface IModeloData {
 	}[];
 }
 
-// The Anos endpoint returns an array of objects for each available year.
 export interface IAno {
 	codigo: string;
 	nome: string;
 }
 export type IAnos = IAno[];
 
-// The Valor endpoint returns details about the vehicle value.
 export interface IValor {
 	TipoVeiculo: number;
 	Valor: string;
@@ -41,10 +33,8 @@ export interface IValor {
 	SiglaCombustivel: string;
 }
 
-// You can define a type for the vehicle type as follows:
 export type VehicleType = "carros" | "motos" | "caminhoes";
 
-// Static class that implements the API methods
 export class FipeAPI {
 	private static readonly BASE_URL = "https://parallelum.com.br/fipe/api/v1";
 
@@ -53,7 +43,11 @@ export class FipeAPI {
 		if (!response.ok) {
 			throw new Error(`Failed to fetch marcas: ${response.statusText}`);
 		}
-		return await response.json();
+		const result = (await response.json()) as IMarcas;
+		console.log("[result]");
+		console.log(result);
+		console.log();
+		return result;
 	}
 
 	public static async getModelos(
@@ -68,7 +62,11 @@ export class FipeAPI {
 		if (!response.ok) {
 			throw new Error(`Failed to fetch modelos: ${response.statusText}`);
 		}
-		return await response.json();
+		const result = (await response.json()) as IModeloData;
+		console.log("[result]");
+		console.log(result);
+		console.log();
+		return result;
 	}
 
 	public static async getAnos(
@@ -84,7 +82,11 @@ export class FipeAPI {
 		if (!response.ok) {
 			throw new Error(`Failed to fetch anos: ${response.statusText}`);
 		}
-		return await response.json();
+		const result = (await response.json()) as IAnos;
+		console.log("[result]");
+		console.log(result);
+		console.log();
+		return result;
 	}
 
 	public static async getValor(
@@ -101,6 +103,10 @@ export class FipeAPI {
 		if (!response.ok) {
 			throw new Error(`Failed to fetch valor: ${response.statusText}`);
 		}
-		return await response.json();
+		const result = (await response.json()) as IValor;
+		console.log("[result]");
+		console.log(result);
+		console.log();
+		return result;
 	}
 }

@@ -1,6 +1,8 @@
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { FipeAPI } from "../api/fipe";
+import { stringify } from "../utils/stringify";
+import { slicer } from "../utils/slicer";
 
 export const getMarcasTool = tool(
 	async ({
@@ -9,12 +11,12 @@ export const getMarcasTool = tool(
 		vehicleType: "carros" | "motos" | "caminhoes";
 	}) => {
 		const result = await FipeAPI.getMarcas(vehicleType);
-		return JSON.stringify(result);
+		return stringify(slicer(result, 100));
 	},
 	{
 		name: "getMarcas",
 		description:
-			"Fetch the list of vehicle brands for a given vehicle type. Valid vehicle types: 'carros', 'motos', or 'caminhoes'.",
+			"FIRST STEP - Gets vehicle brands. REQUIRES: vehicleType from user. OUTPUT: List of brand IDs and names. MUST be used before any other tools. Vehicle type must be confirmed with user first.",
 		schema: z.object({
 			vehicleType: z
 				.enum(["carros", "motos", "caminhoes"])
@@ -34,12 +36,12 @@ export const getModelosTool = tool(
 		marcaId: string;
 	}) => {
 		const result = await FipeAPI.getModelos(vehicleType, marcaId);
-		return JSON.stringify(result);
+		return stringify(slicer(result, 100));
 	},
 	{
 		name: "getModelos",
 		description:
-			"Fetch the list of vehicle models for a specific brand. Requires the vehicle type and brand ID. You need to get the marcas before getting modelos.",
+			"SECOND STEP - Gets models for chosen brand. REQUIRES: marcaId EXACTLY as returned from getMarcas. NEVER use guessed IDs. Verify brand with user before proceeding.",
 		schema: z.object({
 			vehicleType: z
 				.enum(["carros", "motos", "caminhoes"])
@@ -49,7 +51,7 @@ export const getModelosTool = tool(
 			marcaId: z
 				.string()
 				.describe(
-					"The brand ID as returned from the getMarcas endpoint. YOU CANNOT GENERATE THIS VALUE, ITS A CODE."
+					"The brand ID as returned from the getMarcas endpoint. NEVER use guessed IDs."
 				),
 		}),
 	}
@@ -66,12 +68,12 @@ export const getAnosTool = tool(
 		modeloId: string;
 	}) => {
 		const result = await FipeAPI.getAnos(vehicleType, marcaId, modeloId);
-		return JSON.stringify(result);
+		return stringify(slicer(result, 100));
 	},
 	{
 		name: "getAnos",
 		description:
-			"Fetch the list of available years for a specific vehicle model. Requires vehicle type, brand ID, and model ID. You need to get the modelos before getting anos.",
+			"THIRD STEP - Gets production years for selected model. REQUIRES: modeloId from getModelos. MUST confirm model selection with user first. Year IDs often contain suffixes (e.g., '2023-1') - preserve exact format.",
 		schema: z.object({
 			vehicleType: z
 				.enum(["carros", "motos", "caminhoes"])
@@ -82,13 +84,13 @@ export const getAnosTool = tool(
 				.string()
 				.regex(/\d+/)
 				.describe(
-					"The brand ID (numeric) as returned from the getMarcas endpoint. YOU CANNOT GENERATE THIS VALUE, ITS A CODE."
+					"The brand ID (numeric) as returned from the getMarcas endpoint. NEVER use guessed IDs."
 				),
 			modeloId: z
 				.string()
 				.regex(/\d+/)
 				.describe(
-					"The model ID (numeric) as returned from the getModelos endpoint. YOU CANNOT GENERATE THIS VALUE, ITS A CODE."
+					"The model ID (numeric) as returned from the getModelos endpoint. NEVER use guessed IDs."
 				),
 		}),
 	}
@@ -112,7 +114,7 @@ export const getValorTool = tool(
 			modeloId,
 			ano
 		);
-		return JSON.stringify(result);
+		return stringify(slicer(result, 100));
 	},
 	{
 		name: "getValor",
@@ -127,17 +129,17 @@ export const getValorTool = tool(
 			marcaId: z
 				.string()
 				.describe(
-					"The brand ID as returned from the getMarcas endpoint. YOU CANNOT GENERATE THIS VALUE, ITS A CODE."
+					"The brand ID as returned from the getMarcas endpoint. NEVER use guessed IDs."
 				),
 			modeloId: z
 				.string()
 				.describe(
-					"The model ID as returned from the getModelos endpoint. YOU CANNOT GENERATE THIS VALUE, ITS A CODE."
+					"The model ID as returned from the getModelos endpoint. NEVER use guessed IDs."
 				),
 			ano: z
 				.string()
 				.describe(
-					"The year configuration identifier (e.g., '2014-3'). YOU CANNOT GENERATE THIS VALUE, ITS A CODE."
+					"The year configuration identifier (e.g., '2014-3'). NEVER use guessed IDs."
 				),
 		}),
 	}
