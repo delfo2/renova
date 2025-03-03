@@ -1,5 +1,5 @@
-class Exception extends Error {
-	private statusCode: number;
+export class Exception extends Error {
+	public statusCode: number;
 	constructor(exception: {
 		name: string;
 		error: string;
@@ -72,22 +72,12 @@ export class ForbiddenException extends Exception {
 	}
 }
 
-export class UsernameOrPasswordIncorrectException extends Exception {
+export class ErrorWhileGeneratingResponse extends Exception {
 	constructor(error: string) {
 		super({
-			name: "UsernameOrPasswordIncorrectException",
+			name: "ErrorWhileGeneratingResponse",
 			error: error,
-			statusCode: 401,
+			statusCode: 500,
 		});
-	}
-}
-
-export class ErrorWhileGeneratingQuiz extends Exception {
-	constructor(error: string) {
-		super({
-			name: "ErrorWhileGeneratingQuiz",
-			error: error,
-			statusCode: 500
-		})
 	}
 }
