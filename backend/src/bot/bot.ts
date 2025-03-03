@@ -40,10 +40,10 @@ export class Bot {
 	- Follow this strict sequence: Vehicle Type → Brand → Model → Year → Price
 	- NEVER skip steps or assume parameters. Always obtain values through tool usage.
 	- Present API results clearly and ask for user selection before proceeding.
+	- At the end of workflow, always provide for the user the source of the data
 
 	2. **Interaction Rules**
 	- Start by requesting vehicle type if not provided: "carros", "motos" or "caminhoes"
-	- Show brand/model/year options as numbered lists with codes when presenting results
 	- Always convert technical API responses to user-friendly presentations
 	- Explicitly confirm each parameter before tool invocation
 	- STRICTLY USE ONLY IDs FROM THE LAST API RESPONSE
@@ -66,7 +66,14 @@ export class Bot {
 	5. **About**
 	- This AI model is designed to assist with Brazilian vehicle prices only
 	- It was build for a specific use case and may not handle general conversations
-	- It was build to an internal munchies/plati.ia challenge for Alpha EdTech
+	- It was built as Alpha EdTech's internal challenge solution for munchies/plati.ia
+	- Source: This AI model uses the FIPE API for Brazilian vehicle prices by deividfortuna
+
+	6. **Output**
+	- When generating lists of options from the provided data, always include the original 'codigo' for each item.
+	- The 'codigo' should appear inside square brackets directly before or after the option name.
+	- Do not renumber or replace the original 'codigo' values.
+	- For example, if the data is { "codigo": "189", "nome": "ASTON MARTIN" }, then the output should be: [189] ASTON MARTIN
 
 	Never guess IDs - they MUST come from previous API responses!
 	`;
@@ -76,6 +83,7 @@ export class Bot {
 		...previousMessages: Array<SystemMessage | HumanMessage>
 	) {
 		const start = Date.now();
+		console.log(".......................");
 		console.log("Iniciando requisição...");
 
 		const messages = [
@@ -83,8 +91,10 @@ export class Bot {
 			...previousMessages,
 			new HumanMessage(message),
 		];
+		console.log('-first OpenAI prompt-')
 		let aiMessage = await this.completeModel.invoke(messages);
 		messages.push(aiMessage);
+		console.log('-first OpenAI prompt complete-')
 
 		console.log();
 		console.log("[messages]");
@@ -98,32 +108,22 @@ export class Bot {
 					const selectedTool = toolsByName[key];
 					aiMessage = await selectedTool.invoke(toolCall);
 					console.log();
-					console.log("[aiMessage - selectedToolResponse]");
+					console.log();
+					console.log("[aiMessage from tool invocation]");
 					console.log(aiMessage);
 					console.log();
-					// console.log("-calling apiSlicer-");
-					// await this.apiSlicer(aiMessage);
-					// console.log("[aiMessage - sliced]");
-					// console.log(aiMessage);
 					console.log();
-					// console.log();
-					// console.log();
 					messages.push(aiMessage);
 				}
 			}
 			aiMessage = await this.completeModel.invoke(messages);
 			console.log();
-			console.log("[aiMessage - ai tool response]");
+			console.log();
+			console.log("[aiMessage consuming ai tool response]");
 			console.log(aiMessage);
 			console.log();
 			messages.push(aiMessage);
 		}
-		console.log();
-		console.log("[/while]");
-		console.log();
-		console.log("[messages]");
-		console.log(messages);
-		console.log();
 		console.log();
 		const msg = await this.parser.parse(aiMessage.content.toString());
 		console.log(
@@ -131,18 +131,10 @@ export class Bot {
 				(Date.now() - start) +
 				"ms"
 		);
+		console.log(".......................");
+		console.log();
+		console.log();
+		console.log();
 		return msg;
-	}
-
-	private async apiSlicer(aiMessage: AIMessageChunk, maximumLength = 100) {
-		const res = await JSON.parse(aiMessage.content.toString());
-		for (const key in res) {
-			if (res[key].length > maximumLength) {
-				res[key] = res[key].slice(0, maximumLength);
-				console.log(`(apiSlicer) ${key} was sliced`);
-			}
-		}
-		aiMessage.content = JSON.stringify(res);
-		return true;
 	}
 }
