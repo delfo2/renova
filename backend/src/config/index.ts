@@ -5,6 +5,7 @@ export const config = {
 	PORT: process.env.PORT ?? 3000,
 	OPENAI_KEY: process.env.OPENAI_KEY ?? "",
 	DATABASE_URL: process.env.DATABASE_URL ?? "",
+	CLIENT_URL: process.env.CLIENT_URL ?? "http://localhost:4001",
 };
 
 for (const key in config) {

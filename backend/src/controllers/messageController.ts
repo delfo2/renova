@@ -37,12 +37,12 @@ export default class MessageController {
 				content,
 				...formattedMessages
 			);
-			await this.messageService.createMessages(
+			const msg = await this.messageService.createMessages(
 				conversationID,
 				resBot,
 				Speaker.BOT
 			);
-			res.status(201).json(resBot);
+			res.status(201).json(msg);
 		} catch (error) {
 			if (error instanceof Exception) {
 				res.status(error.statusCode).json({ error: error.message });
