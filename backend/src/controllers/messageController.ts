@@ -1,11 +1,10 @@
+import { AIMessage, HumanMessage, ToolMessage } from "@langchain/core/messages";
+import { Speaker } from "@prisma/client";
 import { Request, Response } from "express";
 import prisma from "../database/prisma";
 import { MessageService } from "../services/messageService";
-import { Speaker } from "@prisma/client";
-import { BadRequestException, Exception } from "../utils/Exception";
-import { ERROR_MESSAGES } from "../utils/Message";
+import { Exception } from "../utils/Exception";
 import { Bot } from "../bot/bot";
-import { AIMessage, HumanMessage, ToolMessage } from "@langchain/core/messages";
 import checkIfItsUUID from "../validations/checkIfUUIDIsValid";
 import checkIfItsValidString from "../validations/checkIfStringValid";
 
@@ -45,8 +44,11 @@ export default class MessageController {
 			await this.messageService.createMessages(
 				conversationID,
 				content,
-				Speaker.USER
+				Speaker.USER,
+				new Date(),
+				new Date()
 			);
+			const dateBeforeBotProcess = new Date();
 			const msgs = await this.bot.process(content, ...formattedMessages);
 
 			const prismaMsg = [];
@@ -63,7 +65,9 @@ export default class MessageController {
 					await this.messageService.createMessages(
 						conversationID,
 						JSON.stringify(cont),
-						Speaker.TOOL
+						Speaker.TOOL,
+						dateBeforeBotProcess,
+						new Date()
 					);
 				} else {
 					const cont = await this.bot.parser.parse(
@@ -79,6 +83,8 @@ export default class MessageController {
 							conversationID,
 							cont,
 							Speaker.BOT,
+							dateBeforeBotProcess,
+							new Date(),
 							toolCallsString
 						)
 					);

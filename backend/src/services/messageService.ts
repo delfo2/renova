@@ -19,6 +19,8 @@ export class MessageService {
 		conversationID: string,
 		content: string,
 		speaker: Speaker,
+		createdAt: Date,
+		completedAt: Date,
 		tool_calls: string | null = null
 	) {
 		await this.checkIfExists(conversationID);
@@ -28,6 +30,8 @@ export class MessageService {
 				conversationId: conversationID,
 				speaker: speaker,
 				tool_calls,
+				createdAt,
+				completedAt,
 			},
 		});
 	}

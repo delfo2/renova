@@ -27,7 +27,8 @@ model Conversation {
 
 model Message {
     id             String       @id @default(uuid()) @db.Uuid
-    createdAt      DateTime     @default(now())
+    createdAt      DateTime     @db.Timestamp()
+    completedAt    DateTime     @db.Timestamp()
     content        String
     conversation   Conversation @relation(fields: [conversationId], references: [id])
     conversationId String       @db.Uuid
