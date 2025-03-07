@@ -8,7 +8,7 @@ const app: Express = express();
 app.use(express.json());
 app.use(
 	cors({
-		origin: config.CLIENT_URL,
+		origin: "*",
 		optionsSuccessStatus: 200,
 		credentials: true,
 	})
