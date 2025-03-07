@@ -7,6 +7,7 @@ import { Exception } from "../utils/Exception";
 import { Bot } from "../bot/bot";
 import checkIfItsUUID from "../validations/checkIfUUIDIsValid";
 import checkIfItsValidString from "../validations/checkIfStringValid";
+import { AiMessageWithDate, ToolMessageWithDate } from "../bot/classes";
 
 export default class MessageController {
 	private messageService = new MessageService(prisma);
@@ -48,12 +49,12 @@ export default class MessageController {
 				new Date(),
 				new Date()
 			);
-			const dateBeforeBotProcess = new Date();
 			const msgs = await this.bot.process(content, ...formattedMessages);
 
 			const prismaMsg = [];
-			for (const element of msgs) {
-				if (element instanceof ToolMessage) {
+			for (const el of msgs) {
+				if (el instanceof ToolMessageWithDate) {
+					const element = el.toolMessage;
 					const cont = {
 						content: element.content,
 						name: element.name,
@@ -66,14 +67,21 @@ export default class MessageController {
 						conversationID,
 						JSON.stringify(cont),
 						Speaker.TOOL,
-						dateBeforeBotProcess,
-						new Date()
+						el.createdAt,
+						el.completedAt
 					);
 				} else {
+					const element =
+						el instanceof AiMessageWithDate
+							? el.aiMessage
+							: el.humanMessage;
 					const cont = await this.bot.parser.parse(
 						element.content.toString()
 					);
-					const toolCalls = element.tool_calls;
+					const toolCalls =
+						el instanceof AiMessageWithDate
+							? el.aiMessage.tool_calls
+							: null;
 					const toolCallsString =
 						toolCalls && toolCalls.length > 0
 							? JSON.stringify(toolCalls)
@@ -83,8 +91,8 @@ export default class MessageController {
 							conversationID,
 							cont,
 							Speaker.BOT,
-							dateBeforeBotProcess,
-							new Date(),
+							el.createdAt,
+							el.completedAt,
 							toolCallsString
 						)
 					);

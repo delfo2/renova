@@ -13,6 +13,11 @@ import {
 	getModelosTool,
 	getValorTool,
 } from "../tools/fipeTools";
+import {
+	AiMessageWithDate,
+	HumanMessageWithDate,
+	ToolMessageWithDate,
+} from "./classes";
 
 const toolsByName = {
 	getMarcas: getMarcasTool,
@@ -51,6 +56,11 @@ A API da FIPE segue um **processo sequencial** e depende de **códigos (IDs) ún
 4. Quando o usuário escolher um modelo, consulte a API para obter os anos e exiba os resultados **com os códigos**.
 5. Quando o usuário escolher um ano, consulte a API para obter o preço e exiba os detalhes.
 
+### **Sobre**
+1. Este modelo de IA foi projetado para auxiliar apenas nos preços dos veículos brasileiros
+2. Foi construído como solução de desafio interno da Alpha EdTech para munchies/plati.ia
+3. Fonte: Este modelo de IA utiliza a API FIPE para preços de veículos brasileiros por deividfortuna
+
 Se a API não retornar resultados, informe o usuário e sugira tentar outros parâmetros.
 
 A **Tabela FIPE** é a única fonte dos dados, e todos os preços vêm diretamente dessa base.
@@ -59,7 +69,9 @@ A **Tabela FIPE** é a única fonte dos dados, e todos os preços vêm diretamen
 	public async process(
 		message: string,
 		...previousMessages: Array<SystemMessage | HumanMessage>
-	): Promise<AIMessageChunk[]> {
+	): Promise<
+		Array<HumanMessageWithDate | ToolMessageWithDate | AiMessageWithDate>
+	> {
 		const start = Date.now();
 		console.log(".......................");
 		console.log("Iniciando requisição...");
@@ -75,7 +87,9 @@ A **Tabela FIPE** é a única fonte dos dados, e todos os preços vêm diretamen
 			...previousMessages,
 			new HumanMessage(message),
 		];
-		const newMessages: AIMessageChunk[] = [];
+		const newMessages: Array<
+			HumanMessageWithDate | ToolMessageWithDate | AiMessageWithDate
+		> = [];
 
 		console.log();
 		console.log("[messages]");
@@ -84,8 +98,11 @@ A **Tabela FIPE** é a única fonte dos dados, e todos os preços vêm diretamen
 		console.log();
 
 		console.log("-first OpenAI prompt-");
+		const creationOfAiMessage = new Date();
 		let aiMessage = await this.completeModel.invoke(messages);
-		newMessages.push(aiMessage);
+		newMessages.push(
+			new AiMessageWithDate(creationOfAiMessage, new Date(), aiMessage)
+		);
 		messages.push(aiMessage);
 		console.log("-first OpenAI prompt complete-");
 
@@ -99,6 +116,7 @@ A **Tabela FIPE** é a única fonte dos dados, e todos os preços vêm diretamen
 				if (toolCall.name && toolCall.name in toolsByName) {
 					const key = toolCall.name as keyof typeof toolsByName;
 					const selectedTool = toolsByName[key];
+					const creationOfAiMessage = new Date();
 					const toolMessage = await selectedTool.invoke(toolCall);
 					console.log();
 					console.log();
@@ -107,9 +125,17 @@ A **Tabela FIPE** é a única fonte dos dados, e todos os preços vêm diretamen
 					console.log();
 					console.log();
 					messages.push(toolMessage);
-					newMessages.push(toolMessage);
+					newMessages.push(
+						new ToolMessageWithDate(
+							creationOfAiMessage,
+							new Date(),
+							toolMessage
+						)
+					);
 				}
 			}
+
+			const creationOfAiMessage = new Date();
 			aiMessage = await this.completeModel.invoke(messages);
 			console.log();
 			console.log();
@@ -117,7 +143,13 @@ A **Tabela FIPE** é a única fonte dos dados, e todos os preços vêm diretamen
 			console.log(aiMessage);
 			console.log();
 			messages.push(aiMessage);
-			newMessages.push(aiMessage);
+			newMessages.push(
+				new AiMessageWithDate(
+					creationOfAiMessage,
+					new Date(),
+					aiMessage
+				)
+			);
 		}
 		console.log();
 		console.log(
