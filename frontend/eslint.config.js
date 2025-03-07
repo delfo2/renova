@@ -1,63 +1,64 @@
+import eslint from '@eslint/js';
+import reactPlugin from 'eslint-plugin-react';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import prettierPlugin from 'eslint-plugin-prettier';
+import typescriptPlugin from '@typescript-eslint/eslint-plugin';
+import reactRefreshPlugin from 'eslint-plugin-react-refresh';
+import importPlugin from 'eslint-plugin-import';
+
 export default [
-  {
-    // Flat config: ignore patterns
-    ignores: [
-      "node_modules",
-      "scripts/*",
-      "config/*",
-      "pnpm-lock.yaml",
-      "pnpm-workspace.yaml",
-      ".DS_Store",
-      "package.json",
-      "tsconfig.json",
-      "**/*.md",
-      "build",
-      ".eslintrc.cjs",
-      "eslint.config.js",
-      "**/.*" // Ignore all dotfiles (like .gitignore)
-    ],
-  },
-  {
-    // Language options (ES Modules, JSX)
-    languageOptions: {
-      ecmaVersion: 2021,  // ES2021 syntax support
-      sourceType: 'module',
-      globals: {
-        window: 'readonly', // For browser-based globals
-        document: 'readonly',
-        Edit: 'writable',
-        console: 'writable',
-        _: 'writable',
-        $: 'writable',
-      },
-      ecmaFeatures: {
-        jsx: true, // Enable JSX parsing
-      },
+    {
+        ignores: [
+            'node_modules',
+            'scripts/*',
+            'config/*',
+            'pnpm-lock.yaml',
+            'pnpm-workspace.yaml',
+            '.DS_Store',
+            'package.json',
+            'tsconfig.json',
+            '**/*.md',
+            'build',
+            '.eslintrc.cjs',
+            'eslint.config.js',
+            '**/.*',
+        ],
     },
-    
-    // Plugins to be used
-    plugins: {
-      react: require('eslint-plugin-react'),
-      'react-hooks': require('eslint-plugin-react-hooks'),
-      prettier: require('eslint-plugin-prettier'),
-      '@typescript-eslint': require('@typescript-eslint/eslint-plugin'),
-      'react-refresh': require('eslint-plugin-react-refresh'),
-      import: require('eslint-plugin-import'),
+    {
+        languageOptions: {
+            ecmaVersion: 2021,
+            sourceType: 'module',
+            globals: {
+                window: 'readonly',
+                document: 'readonly',
+                Edit: 'writable',
+                console: 'writable',
+                _: 'writable',
+                $: 'writable',
+            },
+            ecmaFeatures: {
+                jsx: true,
+            },
+        },
+        plugins: {
+            react: reactPlugin,
+            'react-hooks': reactHooksPlugin,
+            prettier: prettierPlugin,
+            '@typescript-eslint': typescriptPlugin,
+            'react-refresh': reactRefreshPlugin,
+            import: importPlugin,
+        },
+        rules: {
+            ...reactPlugin.configs.recommended.rules,
+            ...reactHooksPlugin.configs.recommended.rules,
+            ...typescriptPlugin.configs.recommended.rules,
+            ...prettierPlugin.configs.recommended.rules,
+            'prettier/prettier': 'error',
+        },
+        settings: {
+            react: {
+                version: 'detect',
+            },
+        },
     },
-    
-    // ESLint rule configurations (extends equivalent in Flat Config)
-    rules: {
-      ...require('eslint-plugin-react').configs.recommended.rules,
-      ...require('eslint-plugin-react-hooks').configs.recommended.rules,
-      ...require('@typescript-eslint/eslint-plugin').configs.recommended.rules,
-      ...require('eslint-plugin-prettier').configs.recommended.rules,
-      'prettier/prettier': 'error', // Prettier formatting as an ESLint rule
-    },
-    
-    settings: {
-      react: {
-        version: 'detect',  // Automatically detect the React version
-      },
-    },
-  },
 ];

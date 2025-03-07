@@ -11,4 +11,8 @@ conversationRoutes.get("/", (req, res) =>
 	conversationController.findConversations(req, res)
 );
 
+conversationRoutes.delete("/:id", (req, res) =>
+	conversationController.deleteConversation(req, res)
+);
+
 export default conversationRoutes;

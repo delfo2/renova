@@ -16,6 +16,7 @@ datasource db {
 enum Speaker {
     USER
     BOT
+    TOOL
 }
 
 model Conversation {
@@ -30,5 +31,6 @@ model Message {
     content        String
     conversation   Conversation @relation(fields: [conversationId], references: [id])
     conversationId String       @db.Uuid
+    tool_calls     String?
     speaker        Speaker
 }
