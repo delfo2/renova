@@ -22,6 +22,7 @@
 	},
 	"devDependencies": {
 		"@types/body-parser": "^1.19.5",
+		"@types/cors": "^2.8.17",
 		"@types/express": "^5.0.0",
 		"@types/node": "^22.7.5",
 		"@types/pg": "^8.11.10",

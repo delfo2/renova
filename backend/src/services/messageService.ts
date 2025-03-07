@@ -9,13 +9,19 @@ export class MessageService {
 		await this.checkIfExists(conversationID);
 		return await this.prismaService.message.findMany({
 			where: { conversationId: conversationID },
+			orderBy: {
+				createdAt: "asc",
+			},
 		});
 	}
 
 	async createMessages(
 		conversationID: string,
 		content: string,
-		speaker: Speaker
+		speaker: Speaker,
+		createdAt: Date,
+		completedAt: Date,
+		tool_calls: string | null = null
 	) {
 		await this.checkIfExists(conversationID);
 		return await this.prismaService.message.create({
@@ -23,6 +29,9 @@ export class MessageService {
 				content,
 				conversationId: conversationID,
 				speaker: speaker,
+				tool_calls,
+				createdAt,
+				completedAt,
 			},
 		});
 	}
