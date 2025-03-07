@@ -41,7 +41,8 @@ export default function Input() {
                 content,
                 conversationId: selectedConversation.id,
                 speaker: Speaker.USER,
-                createdAt: new Date().toISOString(),
+                createdAt: new Date(),
+                completedAt: new Date(),
             };
             createMessage(newMessage);
         }

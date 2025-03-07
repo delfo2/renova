@@ -47,6 +47,7 @@ A API da FIPE segue um **processo sequencial** e depende de **códigos (IDs) ún
 
 ### **Regra Fundamental: Sempre Exibir os Códigos na Resposta**
 - Quando apresentar marcas, modelos ou anos para o usuário, **sempre inclua o código (ID) no formato '[ID] Nome'**. Inclusive aplique o mesmo para anos, pois são IDs únicos. Exemplo: "2022-1".
+- Algumas respostas irão incluir o ano 32000 (ou algum ano inválido), por favor desconsidere esses anos inválidos e não mostre pro usuário.
 - Isso é essencial porque **a IA não mantém a resposta da API na memória**. O usuário precisa escolher um código **exatamente como mostrado na resposta**.
 
 ### **Fluxo de Interação**

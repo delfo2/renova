@@ -8,6 +8,7 @@ interface ApiConversation {
 interface ApiMessage {
     id: string;
     createdAt: string;
+    completedAt: string;
     content: string;
     conversationId: string;
     speaker: Speaker;
@@ -33,8 +34,8 @@ export class RenovaApi {
             throw new Error(error);
         }
 
-		console.log(response);
-        return response.json();
+        console.log(response);
+        return await response.json();
     }
 
     async getConversations(): Promise<ApiConversation[]> {
@@ -45,8 +46,27 @@ export class RenovaApi {
             throw new Error(error);
         }
 
-		console.log(response);
-        return response.json();
+        console.log(response);
+        return await response.json();
+    }
+
+    async deleteConversation(conversationId: string): Promise<void> {
+        const response = await fetch(
+            `${this.baseUrl}/api/conversation/${conversationId}`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            },
+        );
+
+        if (!response.ok) {
+            const error = await this.parseError(response);
+            throw new Error(error);
+        }
+
+        return;
     }
 
     async createMessage(
@@ -69,8 +89,8 @@ export class RenovaApi {
             throw new Error(error);
         }
 
-		console.log(response);
-        return response.json();
+        console.log(response);
+        return await response.json();
     }
 
     async getMessages(conversationId: string): Promise<ApiMessage[]> {
@@ -83,8 +103,8 @@ export class RenovaApi {
             throw new Error(error);
         }
 
-		console.log(response);
-        return response.json();
+        console.log(response);
+        return await response.json();
     }
 
     private async parseError(response: Response): Promise<string> {

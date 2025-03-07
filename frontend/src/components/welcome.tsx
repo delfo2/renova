@@ -19,45 +19,57 @@ export default function Welcome() {
                             className="flex flex-col items-center rounded-lg bg-neutral-300 p-4 text-left hover:bg-neutral-100"
                             onClick={() =>
                                 conversationContext.createConversationAndAddMessageToIt(
-                                    'tipo de veículo carro. Quero trocar de carro',
+                                    'Quero presentear alguém com um carro novo',
                                 )
                             }
                         >
-                            <img className='h-5 w-5' src={gift} alt="gift icon" />
-                            Quero trocar de carro
+                            <img
+                                className="h-5 w-5"
+                                src={gift}
+                                alt="gift icon"
+                            />
+                            Quero presentear alguém com um carro novo
                         </button>
                         <button
                             className="flex flex-col items-center rounded-lg bg-neutral-300 p-4 text-left hover:bg-neutral-100"
                             onClick={() =>
                                 conversationContext.createConversationAndAddMessageToIt(
-                                    'tipo de veículo carro. Quero saber o valor do meu carro',
+                                    'Quero saber o valor do meu carro',
                                 )
                             }
                         >
-                            <img className='h-5 w-5' src={car} alt="car icon" />
+                            <img className="h-5 w-5" src={car} alt="car icon" />
                             Quero saber o valor do meu carro
                         </button>
                         <button
                             className="flex flex-col items-center rounded-lg bg-neutral-300 p-4 text-left hover:bg-neutral-100"
                             onClick={() =>
                                 conversationContext.createConversationAndAddMessageToIt(
-                                    'tipo de veículo carro. marca 23 chevrolet. modelo código 8823. ano 2025. Quanto custa esse Onix do ano 2025?',
+                                    'Quanto custa um carro Toyota Corolla?',
                                 )
                             }
                         >
-                            <img className='h-5 w-5' src={money_sack} alt="money sack icon" />
-                            Quanto custa um Onix 2025?
+                            <img
+                                className="h-5 w-5"
+                                src={money_sack}
+                                alt="money sack icon"
+                            />
+                            Quanto custa um carro Toyota Corolla?
                         </button>
                         <button
                             className="flex flex-col items-center rounded-lg bg-neutral-300 p-4 text-left hover:bg-neutral-100"
                             onClick={() =>
                                 conversationContext.createConversationAndAddMessageToIt(
-                                    'Me fale pra que serve bem detalhadamente essa aplicação, quem criou essa aplicação, sua credibilidade e de onde vem os dados.',
+                                    'Me fale sobre a Renova IA',
                                 )
                             }
                         >
-                            <img className='h-5 w-5' src={info} alt="info icon" />
-                            Sobre a Renova IA
+                            <img
+                                className="h-5 w-5"
+                                src={info}
+                                alt="info icon"
+                            />
+                            Me fale sobre a Renova IA
                         </button>
                     </div>
                 </div>

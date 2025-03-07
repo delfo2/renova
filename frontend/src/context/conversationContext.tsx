@@ -11,7 +11,8 @@ import { RenovaApi } from '../api/renovaApi';
 export interface Message {
     id: string;
     content: string;
-    createdAt: string;
+    createdAt: Date;
+    completedAt: Date;
     conversationId: string;
     speaker: Speaker;
 }
@@ -28,6 +29,7 @@ interface ConversationContextType {
     selectedConversation: Conversation | null;
     createConversation: () => void;
     setSelectedConversation: (conversation: Conversation | null) => void;
+    deleteConversation: (conversationID: string) => void;
     createMessage: (message: Message) => void;
     createConversationAndAddMessageToIt: (content: string) => Promise<void>;
     status: 'idle' | 'loading' | 'error';
@@ -88,14 +90,68 @@ export function ConversationProvider({
         });
     }, []);
 
+    const deleteConversation = useCallback((conversationID: string) => {
+        setStatus('loading');
+        console.log(conversationID);
+        renovaApi.current.deleteConversation(conversationID).then(() => {
+            setConversations((prevConversations) =>
+                prevConversations.filter((conv) => conv.id !== conversationID),
+            );
+            setSelectedConversation(null);
+            setStatus('idle');
+        });
+    }, []);
+
+    // Dentro da função createMessage:
     const createMessage = useCallback(
         (message: Message) => {
             updateMessageConversation(message);
+
+            // Adicionar mensagem de loading
+            const loadingMessage: Message = {
+                id: `loading-${Date.now()}`,
+                content: 'loading',
+                conversationId: message.conversationId,
+                speaker: Speaker.BOT,
+                createdAt: new Date(),
+                completedAt: new Date(),
+            };
+            updateMessageConversation(loadingMessage);
+
             setStatus('loading');
             renovaApi.current
                 .createMessage(message.conversationId, message.content)
                 .then((msg) => {
-                    updateMessageConversation(msg);
+                    const convertedMsg = {
+                        ...msg,
+                        createdAt: new Date(msg.createdAt),
+                        completedAt: new Date(msg.completedAt),
+                    };
+                    setConversations((prev) => {
+                        const updatedConversations = prev.map((conv) => {
+                            if (conv.id === msg.conversationId) {
+                                return {
+                                    ...conv,
+                                    messages: conv.messages
+                                        .filter(
+                                            (m) => m.id !== loadingMessage.id,
+                                        ) // Remove apenas o loading correspondente
+                                        .concat(convertedMsg),
+                                };
+                            }
+                            return conv;
+                        });
+
+                        // Atualiza a conversa selecionada com os novos dados
+                        const updatedConv = updatedConversations.find(
+                            (c) => c.id === msg.conversationId,
+                        );
+                        if (updatedConv) {
+                            setSelectedConversation(updatedConv);
+                        }
+
+                        return updatedConversations;
+                    });
                     setStatus('idle');
                 });
         },
@@ -125,7 +181,8 @@ export function ConversationProvider({
                 content,
                 conversationId: newConversation.id,
                 speaker: Speaker.USER,
-                createdAt: new Date().toISOString(),
+                createdAt: new Date(),
+                completedAt: new Date(),
             };
             console.log('createConverastionAndAddMessageToIt', conversations);
             createMessage(userMessage);
@@ -142,8 +199,15 @@ export function ConversationProvider({
                     const msgs = await renovaApi.current.getMessages(
                         conversation.id,
                     );
+                    const completeMsgs = msgs.map((m) => {
+                        return {
+                            ...m,
+                            createdAt: new Date(m.createdAt),
+                            completedAt: new Date(m.completedAt),
+                        };
+                    });
                     return {
-                        messages: msgs,
+                        messages: completeMsgs,
                         name: conversation.id,
                         createdAt: conversation.createdAt,
                         id: conversation.id,
@@ -161,6 +225,7 @@ export function ConversationProvider({
                 selectedConversation,
                 createConversationAndAddMessageToIt,
                 createConversation,
+                deleteConversation,
                 setSelectedConversation,
                 createMessage,
                 status,

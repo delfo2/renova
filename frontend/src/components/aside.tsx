@@ -1,14 +1,25 @@
+import { useEffect, useRef, useState } from 'react';
 import { Conversation, useConversation } from '../context/conversationContext';
 import favicon from '../assets/images/favicon.svg';
 import plus from '../assets/icons/plus.svg';
 import message from '../assets/icons/message.svg';
-import { useEffect, useRef } from 'react';
+import trash from '../assets/icons/trash.svg';
+import ModalConfirmation from './modalConfirmation';
 
 export default function Aside() {
     const conversationContext = useConversation();
     const selectedConversationRef = useRef<HTMLButtonElement | null>(null);
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [conversationToDelete, setConversationToDelete] =
+        useState<string | null>(null);
+
     function selectConversation(conversation: Conversation) {
         conversationContext.setSelectedConversation(conversation);
+    }
+    function deleteConversation(conversationId: string) {
+        setShowDeleteModal(true);
+        setConversationToDelete(conversationId);
     }
 
     useEffect(() => {
@@ -18,6 +29,7 @@ export default function Aside() {
             });
         }
     }, [conversationContext]);
+
     return (
         <div className="flex h-full h-screen max-h-screen w-1/5 flex-col bg-gray-50">
             <h1 className="ml-3 flex h-14 items-center gap-1 py-2 text-lg font-bold">
@@ -49,8 +61,8 @@ export default function Aside() {
                                 ? `border-indigo-600 bg-indigo-100 text-indigo-600`
                                 : '';
                             const imgClass = selected
-                                ? 'filter brightness-[94%] saturate-[5022%] invert-[29%] sepia-[92%] hue-rotate-[241deg] contrast-[91%]'
-                                : '';
+                                ? ''
+                                : 'filter brightness-[106%] saturate-[29%] invert-[0%] sepia-[100%] hue-rotate-[302deg] contrast-[102%]';
                             const msgs = conversation.messages;
                             const lastMessage =
                                 msgs.length > 0
@@ -75,7 +87,7 @@ export default function Aside() {
                                         alt="message icon"
                                         className={`h-3 w-3 ${imgClass}`}
                                     />
-                                    <div className="flex h-auto w-10/12 flex-col gap-1">
+                                    <div className="flex h-auto w-9/12 flex-col gap-1">
                                         <span className="inline-block h-1/2 w-full overflow-x-hidden text-ellipsis whitespace-nowrap text-left font-semibold">
                                             {conversation.name}
                                         </span>
@@ -83,12 +95,41 @@ export default function Aside() {
                                             {lastMessage}
                                         </span>
                                     </div>
+                                    <div
+                                        className="flex h-full w-2/12 items-center justify-center"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            e.preventDefault();
+                                            deleteConversation(conversation.id);
+                                        }}
+                                    >
+                                        <img
+                                            src={trash}
+                                            alt="message icon"
+                                            className={`h-3 w-3 ${imgClass}`}
+                                        />
+                                    </div>
                                 </button>
                             );
                         },
                     )}
                 </div>
             </nav>
+            <ModalConfirmation
+                isOpen={showDeleteModal}
+                onConfirm={() => {
+                    if (conversationToDelete) {
+                        console.log('Deletar conversa:', conversationToDelete);
+                        conversationContext.deleteConversation(
+                            conversationToDelete,
+                        );
+                    }
+                    setShowDeleteModal(false);
+                }}
+                onCancel={() => setShowDeleteModal(false)}
+                title="Deletar conversa"
+                message="Tem certeza que deseja excluir esta conversa? Esta ação não pode ser desfeita."
+            />
         </div>
     );
 }
