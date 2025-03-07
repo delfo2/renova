@@ -40,7 +40,7 @@ services:
             - backend
         restart: always
         ports:
-            - "8080:80"
+            - "80:80"
         networks:
             - renova-network
         volumes:
